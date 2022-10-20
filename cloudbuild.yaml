@@ -1,0 +1,36 @@
+# Cloudbuild pipeline for a build with an image
+# that passes the Scorecard attestation policy
+steps:
+  # Build a 'good' image
+  - id: 'Build image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '.',
+      '-t', 'gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest',
+    ]
+  - id: 'Push image'
+    name: gcr.io/cloud-builders/docker
+    entrypoint: /bin/bash
+    args:
+    - -c
+    - |
+      docker push gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest &&
+      docker image inspect gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest --format '{{index .RepoDigests 0}}' > image-digest.txt &&
+      cat image-digest.txt
+  - id: 'Attest to image'
+    name: "gcr.io/gosst-scare-sandbox/scorecard-attestor:latest"
+    env:
+    - 'COMMIT_SHA=$COMMIT_SHA'
+    - 'REPO_NAME=$REPO_NAME'
+    secretEnv:
+    - GITHUB_AUTH_TOKEN
+    entrypoint: /bin/bash
+    args:
+    - -c
+    - |
+      /scorecard-attestor attest --image=$(cat image-digest.txt) --policy=gs://scorecard-binauthz-test/policy-binauthz.yaml --repo-url=https://github.com/ossf-tests/scorecard-binauthz-test-good --kms-key-name=projects/gosst-scare-sandbox/locations/global/keyRings/kritis-signer-key-ring/cryptoKeys/kritis-signer-key/cryptoKeyVersions/1 --kms-digest-alg=SHA256
+    waitFor:
+      - 'Push image'
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/github-auth-token/versions/latest
+      env: GITHUB_AUTH_TOKEN
