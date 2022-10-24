@@ -8,6 +8,6 @@ COPY . .
 RUN CGO_ENABLED=0 go build -o /go/bin/app
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/static-debian11@sha256:44835b2602c3c437bcb58ee141302b842ba428d473ed131c601c474ce865c09b
-COPY --from=build /go/bin/app /
-CMD ["/app"]
+FROM gcr.io/google-appengine/debian10@sha256:d2e40ef81a0f353f1b9c3cf07e384a1f23db3acdaa0eae4c269b653ab45ffadf
+COPY --from=base /go/bin/app /
+ENTRYPOINT [ "/app" ]
