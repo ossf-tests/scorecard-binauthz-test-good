@@ -27,7 +27,7 @@ steps:
     args:
     - -c
     - |
-      /scorecard-attestor attest --image=$(cat image-digest.txt) --policy=gs://scorecard-binauthz-test/policy-binauthz.yaml --repo-url=https://github.com/ossf-tests/scorecard-binauthz-test-good --kms-key-name=projects/gosst-scare-sandbox/locations/global/keyRings/kritis-signer-key-ring/cryptoKeys/kritis-signer-key/cryptoKeyVersions/1 --kms-digest-alg=SHA256
+      /scorecard-attestor attest --image=$(cat image-digest.txt) --policy=policy-binauthz.yaml --repo-url=https://github.com/ossf-tests/scorecard-binauthz-test-good --kms-key-name=projects/gosst-scare-sandbox/locations/global/keyRings/kritis-signer-key-ring/cryptoKeys/kritis-signer-key/cryptoKeyVersions/1 --kms-digest-alg=SHA256
     waitFor:
       - 'Push image'
 availableSecrets:
