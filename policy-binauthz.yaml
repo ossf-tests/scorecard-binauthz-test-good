@@ -22,11 +22,11 @@ allowedBinaryArtifacts: []
 
 # EnsureNoVulnerabilities : set to true to require that this project is free
 # of vulnerabilities, as discovered from the OSV service
-ensureNoVulnerabilities: true
+preventKnownVulnerabilities: true
 
 # EnsureDependenciesPinned : set to true to require that this project pin dependencies
 # by hash/commit SHA
-ensureDependenciesPinned: true
+preventUnpinnedDependencies: true
 
 # AllowedUnpinnedDependencies : set of dependencies to ignore when checking for
 # unpinned dependencies
