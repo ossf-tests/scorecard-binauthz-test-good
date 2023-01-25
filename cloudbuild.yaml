@@ -5,7 +5,7 @@ steps:
   - id: 'build'
     name: 'gcr.io/cloud-builders/docker'
     args: ['build', '.',
-      '-t', 'gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest',
+      '-t', '{$_IMAGE_NAME}:latest',
     ]
   - id: 'push'
     name: gcr.io/cloud-builders/docker
@@ -13,11 +13,11 @@ steps:
     args:
     - -c
     - |
-      docker push gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest &&
-      docker image inspect gcr.io/gosst-scare-sandbox/scorecard-binauthz-test-good:latest --format '{{index .RepoDigests 0}}' > image-digest.txt &&
+      docker push {$_IMAGE_NAME}:latest &&
+      docker image inspect {$_IMAGE_NAME}:latest --format '{{index .RepoDigests 0}}' > image-digest.txt &&
       cat image-digest.txt
   - id: 'attest'
-    name: "gcr.io/gosst-scare-sandbox/scorecard-attestor:latest"
+    name: "gcr.io/openssf/scorecard-attestor:latest"
     env:
     - 'COMMIT_SHA=$COMMIT_SHA'
     - 'REPO_NAME=$REPO_NAME'
@@ -27,9 +27,11 @@ steps:
     args:
     - -c
     - |
-      /scorecard-attestor attest --image=$(cat image-digest.txt) --policy=policy-binauthz.yaml --repo-url=https://github.com/ossf-tests/scorecard-binauthz-test-good --kms-key-name=projects/gosst-scare-sandbox/locations/global/keyRings/kritis-signer-key-ring/cryptoKeys/kritis-signer-key/cryptoKeyVersions/1 --kms-digest-alg=SHA256
+      /scorecard-attestor attest --image=$(cat image-digest.txt) --policy=policy-binauthz.yaml --repo-url=https://github.com/ossf-tests/scorecard-binauthz-test-good --kms-key-name=projects/$PROJECT_ID/locations/global/keyRings/scorecard-attestor-key-ring/cryptoKeys/scorecard-attestor-key/cryptoKeyVersions/1 --kms-digest-alg=SHA256
     waitFor:
       - 'push'
+substitutions:
+    _IMAGE_NAME: 'gcr.io/${PROJECT_ID}/scorecard-binauthz-test-good:latest'
 availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/github-auth-token/versions/latest
