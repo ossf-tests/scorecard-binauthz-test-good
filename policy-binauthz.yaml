@@ -39,4 +39,4 @@ ensureCodeReviewed: true
 # CodeReviewRequirements : define specific code review requirements that the default
 # branch must have met, e.g. required approvers
 codeReviewRequirements:
-    minReviewers: 1
+    minReviewers: 0 # Review not required for demo repo
