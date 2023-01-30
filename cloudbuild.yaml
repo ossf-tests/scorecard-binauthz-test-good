@@ -17,7 +17,7 @@ steps:
       docker image inspect '${_IMAGE_NAME}:latest' --format '{{index .RepoDigests 0}}' > image-digest.txt &&
       cat image-digest.txt
   - id: 'attest'
-    name: "gcr.io/openssf/scorecard-attestor:latest"
+    name: "gcr.io/openssf/scorecard-attestor/scorecard-attestor:latest"
     env:
     - 'COMMIT_SHA=$COMMIT_SHA'
     - 'REPO_NAME=$REPO_NAME'
